@@ -16,7 +16,7 @@ class Tradechat extends Endpoint {
   }
 
   async main (req, res) {
-    const messages = await this.db.collection('tradechat').find().toArray()
+    const messages = await this.db.collection('tradechat').find().project({ _id: 0 }).toArray()
     res.send(messages)
   }
 }
