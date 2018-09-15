@@ -18,7 +18,8 @@ class Hook {
     if (!(await db.listCollections().toArray()).find(c => c.name === 'tradechat')) {
       await db.createCollection('tradechat', {
         capped: true,
-        size: 100
+        size: 5242880,
+        max: 100
       })
     }
 
