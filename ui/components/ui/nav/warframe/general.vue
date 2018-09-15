@@ -4,6 +4,7 @@
       <router-link to="/warframe" exact>
         <img src="/img/brand/nexushub-logo-typeface.svg" alt="Nexushub Logo" class="logo ico-h-20">
       </router-link>
+      <router-link to="/warframe/tradechat">Global Trade Chat</router-link>
     </div>
     <div class="nav-r">
       <notifications/>
