@@ -20,6 +20,7 @@ class Tradechat extends Endpoint {
 
   async main (req, res) {
     await this.db.collection('tradechat').insert(req.body)
+    await this.publish(req.body)
     res.send('ok')
   }
 }
