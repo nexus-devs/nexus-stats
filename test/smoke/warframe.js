@@ -22,6 +22,10 @@ before(async function () {
   const postOrder = endpoints.find(e => e.route === '/warframe/v1/orders' && e.method === 'POST')
   await client.post(postOrder.route, postOrder.request.body)
 
+  // Prime database with at least one chat message
+  const chatMessage = endpoints.find(e => e.route === '/warframe/v1/orders/tradechat' && e.method === 'POST')
+  await client.post(chatMessage.route, chatMessage.request.body)
+
   // Load parser here so the API client has access to cubic's root credentials
   const parser = require('../lib/EndpointParser.js')
 

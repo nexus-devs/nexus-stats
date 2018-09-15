@@ -8,28 +8,38 @@ class Hook {
    */
   async verifyIndices () {
     cubic.log.verbose('Core      | verifying warframe indices')
-    const db = await mongodb.connect(cubic.config.warframe.core.mongoUrl)
+    const mongo = await mongodb.connect(cubic.config.warframe.core.mongoUrl)
+    const db = mongo.db(cubic.config.warframe.core.mongoDb)
     const verify = async (db, col, index) => {
-      return db.db(cubic.config.warframe.core.mongoDb).collection(col).createIndex(index)
+      return db.collection(col).createIndex(index)
     }
 
-    verify(db, 'orders', {
+    // Capped tradechat collection
+    if (!(await db.listCollections().toArray()).find(c => c.name === 'tradechat')) {
+      await db.createCollection('tradechat', {
+        capped: true,
+        size: 100
+      })
+    }
+
+    // Indices
+    await verify(db, 'orders', {
       item: 1
     })
-    verify(db, 'orderHistory', {
+    await verify(db, 'orderHistory', {
       item: 1,
       createdAt: 1
     })
-    verify(db, 'orderHistory', {
+    await verify(db, 'orderHistory', {
       createdAt: 1
     })
-    verify(db, 'items', {
+    await verify(db, 'items', {
       name: 1
     })
-    verify(db, 'users', {
+    await verify(db, 'users', {
       name: 1
     })
-    db.close()
+    mongo.close()
   }
 
   /**
