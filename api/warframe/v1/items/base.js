@@ -11,7 +11,7 @@ class Item extends Endpoint {
       median: Number,
       min: Number,
       max: Number,
-      offers: Number
+      orders: Number
     }
     this.schema.response = {
       uniqueName: String,
@@ -21,8 +21,10 @@ class Item extends Endpoint {
       components: [{
         name: String,
         ducats: Number,
-        selling: { current: economyData, previous: economyData },
-        buying: { current: economyData, previous: economyData },
+        prices: {
+          selling: { current: economyData, previous: economyData },
+          buying: { current: economyData, previous: economyData }
+        },
         imgUrl: String
       }],
       wikiaUrl: String,

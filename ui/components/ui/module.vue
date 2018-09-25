@@ -73,6 +73,7 @@ export default {
     margin-top: 8px;
     margin-left: 15px;
     color: white;
+    margin-bottom: 20px;
   }
   p, span {
     color: white;
@@ -85,14 +86,15 @@ export default {
 
 .footer {
   display: flex;
-  padding: 8px 25px;
+  padding: 4px 25px;
   margin-top: auto;
   background: $color-bg;
-  font-size: 0.75em;
+  font-size: 0.75em !important;
   border-radius: 2px;
 
   a {
     display: flex;
+    margin-left: auto;
     align-items: center;
     text-transform: uppercase;
     @include ie;

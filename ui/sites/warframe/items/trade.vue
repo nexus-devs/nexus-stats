@@ -21,14 +21,6 @@
                 </transition-group>
               </div>
             </div>
-            <div class="col-b components-container">
-              <h2 class="sub">Components</h2>
-              <div>
-                <div class="row components">
-                  <comp v-for="component in components" :key="component.uniqueName" :component="component" class="col"/>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -176,11 +168,14 @@ export default {
     item () {
       return this.$store.state.items.item
     },
+    all () {
+      return this.$store.state.orders.all
+    },
     listings () {
       return this.$store.state.orders.listings
     },
     realtime () {
-      return Array(4).fill().map((e, i) => [].concat(this.listings).sort((a, b) => {
+      return Array(6).fill().map((e, i) => [].concat(this.all).sort((a, b) => {
         return new Date(a.createdAt) < new Date(b.createdAt) ? 1 : -1
       })[i] || {})
     },
@@ -372,34 +367,8 @@ h2 {
   }
 }
 
-.components-container {
-  @media (max-width: $breakpoint-m) {
-    margin-left: 0;
-    padding-left: 0;
-    padding-top: 40px !important;
-  }
-  @media (max-width: $breakpoint-s) {
-    display: none;
-  }
-}
-
-.components {
-  flex-direction: column;
-  @include field;
-
-  @media (max-width: $breakpoint-m) {
-    flex-direction: row;
-    background: none;
-    box-shadow: none;
-
-    &:hover {
-      background: none;
-    }
-  }
-}
-
 .type {
-  padding-bottom: 10px;
+  padding-bottom: 15px;
   margin-bottom: 20px;
   width: 100%;
   border-bottom: 1px solid $color-subtle-dark;
@@ -446,7 +415,15 @@ h2 {
         font-weight: 400;
       }
       span {
-        display: none;
+        position: relative;
+        top: 1px;
+        margin-left: 5px;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.8em;
+        color: white;
+        background: $color-bg;
+        @include ease(0.25s);
       }
       .image-wrapper {
         height: 29px;

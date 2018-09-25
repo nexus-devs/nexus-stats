@@ -14,25 +14,26 @@ class Hook {
       return db.collection(col).createIndex(index)
     }
 
-    // Capped tradechat collection
-    if (!(await db.listCollections().toArray()).find(c => c.name === 'tradechat')) {
-      await db.createCollection('tradechat', {
-        capped: true,
-        size: 5242880,
-        max: 100
-      })
-    }
-
-    // Indices
-    await verify(db, 'orders', {
+    await verify(db, 'activeOrders', {
       item: 1
     })
-    await verify(db, 'orderHistory', {
+    await verify(db, 'orders', {
+      item: 1,
+      component: 1,
+      createdAt: 1,
+      price: 1
+    })
+    await verify(db, 'orders', {
       item: 1,
       createdAt: 1
     })
-    await verify(db, 'orderHistory', {
+    await verify(db, 'orders', {
       createdAt: 1
+    })
+    await verify(db, 'ordersAggregation', {
+      name: 1,
+      createdAt: 1,
+      scope: 1
     })
     await verify(db, 'items', {
       name: 1
@@ -81,6 +82,8 @@ class Hook {
   addItemSet (item) {
     const set = { name: 'Set' }
 
+    set.uniqueName = item.uniqueName
+    if (item.tradable) set.tradable = true
     if (item.drops) set.drops = item.drops
     if (item.components && item.components[0].ducats) {
       let ducats = 0
@@ -107,8 +110,6 @@ class Hook {
     item.imgUrl = `/img/warframe/items/${item.imageName}`
 
     for (let component of item.components) {
-      component.apiUrl = `/warframe/v1/items/${encodeURIComponent(item.name)}`
-      component.webUrl = `/warframe/items/${item.name.split(' ').join('-').toLowerCase()}`
       component.imgUrl = component.imageName ? `/img/warframe/items/${component.imageName}` : item.imgUrl
       delete component.imageName
     }
@@ -124,30 +125,26 @@ class Hook {
    * Add economy data defaults
    */
   addEconomyData (item, stored) {
-    function r (min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min
-    }
     for (let component of item.components) {
-      const current = {
-        median: r(5, 30),
-        min: r(2, 5),
-        max: r(30, 50),
-        offers: r(500, 8000)
+      const economyData = {
+        median: null,
+        min: null,
+        max: null,
+        orders: null
       }
-      const previous = {
-        median: r(5, 30),
-        min: r(2, 5),
-        max: r(30, 50),
-        offers: r(500, 8000)
-      }
+
+      // Skip if data is already present
       if (stored) {
         const storedComponent = stored.components.find(c => c.name === component.name)
-        if (storedComponent && storedComponent.selling && storedComponent.buying) {
+        if (storedComponent && storedComponent.prices) {
           continue
         }
       }
-      // component.selling = component.buying = economyData
-      component.selling = component.buying = { current, previous }
+      component.prices = {}
+      component.prices.selling = component.prices.buying = {
+        current: economyData,
+        previous: economyData
+      }
     }
   }
 }

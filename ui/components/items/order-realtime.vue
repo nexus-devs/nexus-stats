@@ -15,9 +15,7 @@
       <span class="main-value">
         {{ order.price ? `${order.price}p` : 'any offer' }}
       </span>
-      <span v-if="order.price" :class="{ negative: order.offer === 'Selling' ? priceDiff >= 0 : priceDiff <= 0 }">
-        {{ priceDiff > 0 ? '+' : '' }}{{ priceDiff }}%
-      </span>
+      <price-diff :type="order.offer" :base="median" :value="order.price" unit="p"/>
     </template>
   </module>
 </template>
@@ -26,10 +24,12 @@
 
 <script>
 import module from 'src/components/ui/module.vue'
+import priceDiff from 'src/components/items/price-diff.vue'
 
 export default {
   components: {
-    module
+    module,
+    priceDiff
   },
 
   props: ['order'],
@@ -38,25 +38,17 @@ export default {
     item () {
       return this.$store.state.items.item
     },
+    median () {
+      if (this.order.offer) {
+        const type = this.order.offer.toLowerCase()
+        return this.component.prices[type].current.median
+      }
+    },
     component () {
       if (this.order) {
         return this.item.components.find(c => c.name === this.order.component) || {
           selling: { current: {}},
           buying: { current: {}}
-        }
-      } else {
-        return {}
-      }
-    },
-    priceDiff () {
-      if (this.order) {
-        const type = this.order.offer.toLowerCase()
-        const value = this.order.price - this.component[type].current.median
-
-        if (this.order.price) {
-          return (value / this.component[type].current.median * 100).toFixed(2)
-        } else {
-          return null
         }
       } else {
         return {}
@@ -81,30 +73,40 @@ export default {
   @include ie;
   border-radius: 2px;
   padding: 0;
-  flex-basis: 33%;
+  flex-basis: 25%;
   margin-right: 15px;
   margin-bottom: 15px;
   @include ease(0.5s);
 
+  @media (max-width: $breakpoint-m) {
+    flex-basis: 33%;
+  }
   &:hover {
     @include gradient-background-dg(#3c4451, #353d49);
   }
   &:before {
     border-radius: 2px;
   }
-  &:nth-of-type(n + 5) {
+  &:nth-of-type(n + 7) {
     display: none;
+  }
+  &:nth-of-type(n + 5) {
+    @media (max-width: $breakpoint-m) {
+      display: none;
+    }
   }
   /deep/ .header {
     padding: 20px 20px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    white-space: nowrap;
 
     .user {
       font-size: 0.9em !important;
       color: white !important;
       text-transform: none;
+
       @media (max-width: $breakpoint-m) {
         display: none;
       }
@@ -112,22 +114,6 @@ export default {
   }
   /deep/ .body {
     padding: 30px 25px;
-  }
-  .main-value + span {
-    color: $color-primary;
-    font-size: 0.85em;
-
-    &.negative {
-      color: $color-error;
-    }
-  }
-  @media (max-width: $breakpoint-m) {
-    margin-right: 10px;
-  }
-  @media (max-width: $breakpoint-s) {
-    &:nth-of-type(even) {
-      margin-right: 0;
-    }
   }
 }
 

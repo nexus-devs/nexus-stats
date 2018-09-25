@@ -8,7 +8,6 @@ pipeline:
       # Determine if webpack needs a rebuild.
       - git fetch origin
       - git checkout origin/staging config/webpack/build.json
-      - git checkout $DRONE_BRANCH
       - npm run toggle-webpack
       - npm run build -- staging
     when:
@@ -56,8 +55,8 @@ pipeline:
       - git config --global user.name "nexus-ci"
 
       # Modify files as needed for staging build
-      - sed -i '/\\/assets\\/bundles\\//d' .gitignore # Keep webpack builds
-      - mv assets/.robots.txt assets/robots.txt # Make search engines ignore the staging site
+      - sed -i '/\\/ui\\/assets\\/bundles\\//d' .gitignore # Keep webpack builds
+      - mv ui/assets/.robots.txt ui/assets/robots.txt # Make search engines ignore the staging site
 
       # Push changes from above and from dev branch
       - bash build/stage.sh
